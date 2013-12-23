@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Quickdraw::VERSION
   spec.authors       = ["Bryan Morris"]
   spec.email         = ["bryan@internalfx.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Quickly develop Shopify themes}
+  spec.summary       = %q{Allows the use of ERB templates to develop and "compile" a theme and then automatically deploy to Shopify}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,4 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+
+  spec.add_development_dependency "filewatcher"
+  spec.add_development_dependency "celluloid"
+  spec.add_development_dependency "httparty"
 end

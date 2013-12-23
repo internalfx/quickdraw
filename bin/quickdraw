@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-# This allows shopify_them to run easily from a git checkout without install.
-# Hat tip to chriseppstein of Compass fame for the code for this
 def fallback_load_path(path)
 	retried = false
 	begin
@@ -17,8 +15,8 @@ def fallback_load_path(path)
 end
 
 fallback_load_path(File.join(File.dirname(__FILE__), '..', 'lib')) do
-	require 'shopify_theme'
-	require 'shopify_theme/cli'
+	require 'quickdraw'
+	require 'quickdraw/cli'
 end
 
-ShopifyTheme::Cli.start(ARGV)
+Quickdraw::Cli.start(ARGV)
