@@ -5,7 +5,7 @@ require 'thor'
 #require 'base64'
 #require 'fileutils'
 #require 'json'
-#require 'listen'
+require 'listen'
 #require 'launchy'
 
 module Quickdraw
@@ -94,34 +94,34 @@ module Quickdraw
 		#	end
 		#	say("Done.", :green) unless options['quiet']
 		#end
-		#
-		#desc "watch", "upload and delete individual theme assets as they change, use the --keep_files flag to disable remote file deletion"
-		#method_option :quiet, :type => :boolean, :default => false
-		#method_option :keep_files, :type => :boolean, :default => false
-		#def watch
-		#	puts "Watching current folder: #{Dir.pwd}"
-		#	listener = Listen.to(Dir.pwd) do |modified, added, removed|
-		#		modified.each do |filePath|
-		#			filePath.slice!(Dir.pwd + "/")
-		#			send_asset(filePath, options['quiet']) if local_assets_list.include?(filePath)
-		#		end
-		#		added.each do |filePath|
-		#			filePath.slice!(Dir.pwd + "/")
-		#			send_asset(filePath, options['quiet']) if local_assets_list.include?(filePath)
-		#		end
-		#		unless options['keep_files']
-		#			removed.each do |filePath|
-		#				filePath.slice!(Dir.pwd + "/")
-		#				delete_asset(filePath, options['quiet']) if !local_assets_list.include?(filePath)
-		#			end
-		#		end
-		#	end
-		#	listener.start
-		#	sleep
-		#rescue Interrupt
-		#	puts "exiting...."
-		#end
-		#
+
+		desc "watch", "compile then upload and delete individual theme assets as they change, use the --keep_files flag to disable remote file deletion"
+		method_option :quiet, :type => :boolean, :default => false
+		method_option :keep_files, :type => :boolean, :default => false
+		def watch
+			puts "Watching current folder: #{Dir.pwd}"
+			listener = Listen.to(Dir.pwd) do |modified, added, removed|
+				modified.each do |filePath|
+					filePath.slice!(Dir.pwd + "/")
+					send_asset(filePath, options['quiet']) if local_assets_list.include?(filePath)
+				end
+				added.each do |filePath|
+					filePath.slice!(Dir.pwd + "/")
+					send_asset(filePath, options['quiet']) if local_assets_list.include?(filePath)
+				end
+				unless options['keep_files']
+					removed.each do |filePath|
+						filePath.slice!(Dir.pwd + "/")
+						delete_asset(filePath, options['quiet']) if !local_assets_list.include?(filePath)
+					end
+				end
+			end
+			listener.start
+			sleep
+		rescue
+			puts "exiting...."
+		end
+
 		#private
 		#
 		#def local_assets_list
