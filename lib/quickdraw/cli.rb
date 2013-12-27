@@ -20,10 +20,17 @@ module Quickdraw
 		DEFAULT_WHITELIST = %w(layout/ assets/ config/ snippets/ templates/)
 		TIMEFORMAT = "%H:%M:%S"
 
-		desc "configure API_KEY PASSWORD STORE THEME_ID", "generate a config file for the store to connect to"
-		def configure(api_key=nil, password=nil, store=nil, theme_id=nil)
-			config = {:api_key => api_key, :password => password, :store => store, :theme_id => theme_id}
+		desc "configure", "generate a config file for the store to connect to"
+		def configure
+			config = {
+				:api_key => ask("API Key?"),
+				:password => ask("Password?"),
+				:store => ask("Store domain (ex. 'example.myshopify.com')?"),
+				:theme_id => ask("Theme ID")
+			}
 			create_file('config.yml', config.to_yaml)
+			empty_directory('src')
+			empty_directory('theme')
 		end
 
 		desc "upload FILES", "upload all theme assets to shop"

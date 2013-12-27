@@ -24,6 +24,9 @@ Or install it yourself as:
 ## Usage
 
 1. Create a project folder and open a terminal
+2. run ````quickdraw configure````
+3. run ````quickdraw download````
+4. run ````quickdraw watch````
 
 ## Contributing
 
