@@ -39,7 +39,7 @@ To use ERB create a copy of the ````.liquid```` file you want to use, add an ```
     project/theme/templates/index.liquid
     project/src/templates/index.liquid.erb
 
-When the ````project/src/templates/index.liquid.erb```` is modified, Quickdraw will render it, overwriting ````project/theme/templates/index.liquid````, and uploading the result to Shopify
+When the ````project/src/templates/index.liquid.erb```` is modified, Quickdraw will render it, overwriting ````project/theme/templates/index.liquid````, and uploading the result to Shopify.
 
 ## Contributing
 
