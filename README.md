@@ -1,6 +1,10 @@
 # Quickdraw
 
-TODO: Write a gem description
+The idea for Quickdraw comes from the 'shopify_theme' gem. I use a lot of code from them.
+
+### Features
+
+- MUCH faster downloads and uploads. Quickdraw can download your files as much as 10x faster or more!
 
 ## Installation
 

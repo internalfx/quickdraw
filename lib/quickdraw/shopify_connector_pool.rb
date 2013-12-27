@@ -16,7 +16,7 @@ module Quickdraw
 
 				if response.code == 429
 					tries += 1
-					puts "Too fast for Shopify!"
+					puts "Too fast for Shopify! Retrying..."
 					raise "Slow down!"
 				end
 
@@ -26,7 +26,7 @@ module Quickdraw
 				end
 
 			rescue => e
-				sleep 3
+				sleep 1
 				retry unless (tries -= 1).zero?
 			end
 

@@ -20,9 +20,15 @@ module Quickdraw
 
 		desc "download FILE", "download the shops current theme assets"
 		#method_option :quiet, :type => :boolean, :default => false
-		def download(*keys)
+		def download(filter)
 
-			assets = keys.empty? ? Celluloid::Actor[:shopify_connector].get_asset_list : keys
+			asset_list = Celluloid::Actor[:shopify_connector].get_asset_list
+
+			if filter.empty?
+				assets = asset_list
+			else
+				assets = asset_list.select{ |i| i[/^#{filter}/] }
+			end
 
 			futures = []
 
