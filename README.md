@@ -5,6 +5,7 @@ The idea for Quickdraw comes from the 'shopify_theme' gem. I use a lot of code f
 ### Features
 
 - MUCH faster downloads and uploads. Unfortunately, Shopify API call limits will slow you down. But in short bursts (10-20 files), Quickdraw is as much as 10x faster or more!
+- Quickdraw supports using ERB templates which are compiled then uploaded to shopify. This can save you time when making templates with redundant code.
 
 ## Installation
 
@@ -22,7 +23,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Create a project folder and open a terminal
 
 ## Contributing
 
