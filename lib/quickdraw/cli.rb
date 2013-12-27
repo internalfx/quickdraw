@@ -18,13 +18,19 @@ module Quickdraw
 		DEFAULT_WHITELIST = %w(layout/ assets/ config/ snippets/ templates/)
 		TIMEFORMAT = "%H:%M:%S"
 
+		desc "configure API_KEY PASSWORD STORE THEME_ID", "generate a config file for the store to connect to"
+		def configure(api_key=nil, password=nil, store=nil, theme_id=nil)
+			config = {:api_key => api_key, :password => password, :store => store, :theme_id => theme_id}
+			create_file('config.yml', config.to_yaml)
+		end
+
 		desc "download FILE", "download the shops current theme assets"
 		#method_option :quiet, :type => :boolean, :default => false
-		def download(filter)
+		def download(filter=nil)
 
 			asset_list = Celluloid::Actor[:shopify_connector].get_asset_list
 
-			if filter.empty?
+			if filter
 				assets = asset_list
 			else
 				assets = asset_list.select{ |i| i[/^#{filter}/] }
