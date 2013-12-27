@@ -29,6 +29,18 @@ Or install it yourself as:
 3. run ````quickdraw download````
 4. run ````quickdraw watch````
 
+### Workflow
+
+Quickdraw creates two folders in your project, ````theme```` and ````src````.
+When ````quickdraw watch```` is running, files added/changed/deleted in the ````theme```` folder will be mirrored to Shopify automatically.
+To use ERB create a copy of the ````.liquid```` file you want to use, add an ````.erb```` extension to the end, and move it to the ````src```` folder.
+
+#####Example
+    project/theme/templates/index.liquid
+    project/src/templates/index.liquid.erb
+
+When the ````project/src/templates/index.liquid.erb```` is modified, Quickdraw will render it, overwriting ````project/theme/templates/index.liquid````, and uploading the result to Shopify
+
 ## Contributing
 
 1. Fork it
