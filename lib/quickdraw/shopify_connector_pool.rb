@@ -1,23 +1,35 @@
 
 require 'httparty'
 require 'celluloid'
+require 'filepath'
 
 module Quickdraw
 	class ShopifyConnectorPool
 		include HTTParty
 		include Celluloid
 
-		def get(path, options = {})
+		def initialize
+			@config = Quickdraw.config
+			@auth = {:username => @config[:api_key], :password => @config[:password]}
+		end
+
+		def request(call_type, path, options)
+			options.merge!({:basic_auth => @auth})
 
 			begin
 				tries ||= 3
 
-				response = HTTParty.get(path, options)
+				response = HTTParty.send(call_type, path, options)
 
 				if response.code == 429
 					tries += 1
 					puts "Too fast for Shopify! Retrying..."
 					raise "Slow down!"
+				end
+
+				if response.code == 403
+					tries == 0
+					raise "Forbidden"
 				end
 
 				if response.code != 200
@@ -26,8 +38,11 @@ module Quickdraw
 				end
 
 			rescue => e
-				sleep 1
-				retry unless (tries -= 1).zero?
+				tries -= 1
+				if tries > 0
+					sleep 1
+					retry
+				end
 			end
 
 			return response
@@ -35,5 +50,5 @@ module Quickdraw
 
 	end
 
-	Celluloid::Actor[:shopify_connector_pool] = ShopifyConnectorPool.pool(:size => 16)
+	Celluloid::Actor[:shopify_connector_pool] = ShopifyConnectorPool.pool(:size => 24)
 end
