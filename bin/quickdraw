@@ -16,7 +16,10 @@ end
 
 fallback_load_path(File.join(File.dirname(__FILE__), '..', 'lib')) do
 	require 'quickdraw'
+	require 'quickdraw/shopify_connector'
+	require 'quickdraw/shopify_connector_pool'
 	require 'quickdraw/cli'
+	require 'celluloid'
 end
 
 Quickdraw::Cli.start(ARGV)

@@ -1,159 +1,64 @@
 
-class ShopifyConnector
-	include Celluloid
+require 'httparty'
+require 'celluloid'
+require 'pathname'
 
-	#def confirm_app_installed(shop)
-	#	response = get_shop(shop).response.code
-	#	return response == '200'
-	#end
-	#
-	#def get_shop(shop)
-	#	if shop
-	#		begin
-	#			tries ||= 3
-	#			return HTTParty.get("https://#{shop.title}/admin/shop.json", {:headers => {'X-Shopify-Access-Token' => shop.token}})
-	#		rescue => e
-	#			puts e.inspect
-	#			retry unless (tries -= 1).zero?
-	#		end
-	#	end
-	#end
-	#
-	#def get_products(shop, page=1)
-	#	if shop
-	#		begin
-	#			tries ||= 3
-	#			return HTTParty.get("https://#{shop.title}/admin/products.json", {:body => {:limit => 250, :page => page}, :headers => {'X-Shopify-Access-Token' => shop.token}})['products']
-	#		rescue => e
-	#			puts e.inspect
-	#			retry unless (tries -= 1).zero?
-	#		end
-	#	end
-	#end
-	#
-	#def get_product_count(shop)
-	#	begin
-	#		tries ||= 3
-	#		result = HTTParty.get("https://#{shop.title}/admin/products/count.json", {:headers => {'X-Shopify-Access-Token' => shop.token}})['count']
-	#		if result
-	#			return result
-	#		else
-	#			return 0
-	#		end
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def create_webhook(shop, webhook)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.post("https://#{shop.title}/admin/webhooks.json", {:body => {:webhook => webhook}, :headers => {'X-Shopify-Access-Token' => shop.token}})
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def get_script_tags(shop, src)
-	#	if shop
-	#		begin
-	#			tries ||= 3
-	#			return HTTParty.get("https://#{shop.title}/admin/script_tags.json", {:body => {:src => src}, :headers => {'X-Shopify-Access-Token' => shop.token}})['script_tags']
-	#		rescue => e
-	#			puts e.inspect
-	#			retry unless (tries -= 1).zero?
-	#		end
-	#	end
-	#end
-	#
-	#def create_script_tag(shop, script_tag)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.post("https://#{shop.title}/admin/script_tags.json", {:body => {:script_tag => script_tag}, :headers => {'X-Shopify-Access-Token' => shop.token}})
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def get_recurring_application_charges(shop)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.get(
-	#			"https://#{shop.title}/admin/recurring_application_charges.json",
-	#			{
-	#				:headers => {
-	#					'X-Shopify-Access-Token' => shop.token
-	#				}
-	#			}
-	#		)['recurring_application_charges']
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def create_recurring_application_charge(shop, price)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.post(
-	#			"https://#{shop.title}/admin/recurring_application_charges.json",
-	#			{
-	#				:body => {
-	#					:recurring_application_charge => {
-	#						:name => 'Search Reactor',
-	#						:price => price,
-	#						:return_url => "#{Rails.configuration.app_domain}/activate",
-	#						:trial_days => get_trial_days(shop),
-	#						:test => Rails.env.development?,
-	#					}
-	#				},
-	#				:headers => {
-	#					'X-Shopify-Access-Token' => shop.token
-	#				}
-	#			}
-	#		)
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def activate_recurring_application_charge(shop, charge_id)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.post(
-	#			"https://#{shop.title}/admin/recurring_application_charges/#{charge_id}/activate.json",
-	#			{
-	#				:headers => {
-	#					'X-Shopify-Access-Token' => shop.token
-	#				}
-	#			}
-	#		)
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
-	#
-	#def delete_recurring_application_charge(shop, charge_id)
-	#	begin
-	#		tries ||= 3
-	#		return HTTParty.post(
-	#			"https://#{shop.title}/admin/recurring_application_charges/#{charge_id}.json",
-	#			{
-	#				:headers => {
-	#					'X-Shopify-Access-Token' => shop.token
-	#				}
-	#			}
-	#		)
-	#	rescue => e
-	#		puts e.inspect
-	#		retry unless (tries -= 1).zero?
-	#	end
-	#end
+module Quickdraw
+	class ShopifyConnector
+		include Celluloid
 
+		NOOPParser = Proc.new {|data, format| {} }
+
+		def initialize
+			@config = Quickdraw.config
+			@auth = {:username => @config[:username], :password => @config[:password]}
+		end
+
+		def get(path, options={})
+			options.merge!({:basic_auth => @auth})
+
+			response = Celluloid::Actor[:shopify_connector_pool].get(path, options)
+
+			return response
+		end
+
+		def get_asset_list(options={})
+			options.merge!({:parser => NOOPParser})
+			response = get("https://#{@config[:store]}/admin/themes/#{@config[:theme_id]}/assets.json", options)
+
+			if JSON.parse(response.body)["assets"]
+				return JSON.parse(response.body)["assets"].collect {|a| a['key'] }
+			end
+
+			return nil
+		end
+
+		def download_asset(assetpath, options={})
+			options.merge!({:query => {:asset => {:key => assetpath}}, :parser => NOOPParser})
+
+			response = get("https://#{@config[:store]}/admin/themes/#{@config[:theme_id]}/assets.json", options)
+
+			# HTTParty json parsing is broken?
+			asset = response.code == 200 ? JSON.parse(response.body)["asset"] : {}
+			asset['response'] = response
+
+			if asset['value']
+				# For CRLF line endings
+				content = asset['value'].gsub("\r", "")
+				format = "w"
+			elsif asset['attachment']
+				content = Base64.decode64(asset['attachment'])
+				format = "w+b"
+			end
+
+			save_path = "theme/"+assetpath
+
+			FileUtils.mkdir_p(File.dirname(save_path))
+			File.open(save_path, format) {|f| f.write content} if content
+
+			return assetpath
+		end
+	end
+
+	ShopifyConnector.supervise_as(:shopify_connector)
 end
-Celluloid::Actor[:shopify_conn] = ShopifyConnector.pool(:size => 32)
