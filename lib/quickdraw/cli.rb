@@ -30,7 +30,17 @@ module Quickdraw
 			}
 			create_file('config.yml', config.to_yaml)
 			empty_directory('src')
+			empty_directory('src/assets')
+			empty_directory('src/config')
+			empty_directory('src/layout')
+			empty_directory('src/snippets')
+			empty_directory('src/templates')
 			empty_directory('theme')
+			empty_directory('theme/assets')
+			empty_directory('theme/config')
+			empty_directory('theme/layout')
+			empty_directory('theme/snippets')
+			empty_directory('theme/templates')
 		end
 
 		desc "upload FILES", "upload all theme assets to shop"
