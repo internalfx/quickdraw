@@ -1,11 +1,11 @@
 require 'thor'
-#require 'yaml'
+require 'yaml'
 #YAML::ENGINE.yamler = 'syck' if defined? Syck
 #require 'abbrev'
 #require 'base64'
 #require 'fileutils'
 #require 'json'
-require 'listen'
+require 'filewatcher'
 #require 'launchy'
 require 'benchmark'
 require 'pathname'
@@ -171,34 +171,32 @@ module Quickdraw
 
 			futures = []
 
-			listener = Listen.to((Quickdraw.getwd/'theme').to_s, (Quickdraw.getwd/'src').to_s, :force_polling => true, :latency => 0.2 ) do |modified, added, removed|
-				modified.each do |asset|
-					asset = asset.as_path
-					say("MODIFIED: #{asset.relative_to(Quickdraw.getwd)}", :green)
+			FileWatcher.new([(Quickdraw.getwd/'theme').to_s, (Quickdraw.getwd/'src').to_s]).watch(0.5) do |asset, event|
+				asset = asset.as_path
+				if(event == :changed)
 					if theme_file?(asset)
+						say("UPLOADING: #{asset.relative_to(Quickdraw.getwd)}", :green)
 						futures << Celluloid::Actor[:shopify_connector].future.upload_asset(asset)
 					elsif src_file?(asset)
+						say("COMPILING: #{asset.relative_to(Quickdraw.getwd)}", :green)
 						futures << Celluloid::Actor[:shopify_connector].future.compile_asset(asset)
 					end
 				end
-				added.each do |asset|
-					asset = asset.as_path
-					say("ADDED: #{asset}", :green)
+				if(event == :delete)
 					if theme_file?(asset)
-						futures << Celluloid::Actor[:shopify_connector].future.upload_asset(asset)
-					else
-					end
-				end
-				removed.each do |asset|
-					asset = asset.as_path
-					say("REMOVED: #{asset}", :green)
-					if theme_file?(asset)
+						say("REMOVING: #{asset}", :green)
 						futures << Celluloid::Actor[:shopify_connector].future.remove_asset(asset)
 					else
 					end
 				end
+				if(event == :new)
+					if theme_file?(asset)
+						say("ADDING: #{asset}", :green)
+						futures << Celluloid::Actor[:shopify_connector].future.upload_asset(asset)
+					else
+					end
+				end
 			end
-			listener.start
 
 			loop do
 
@@ -217,7 +215,10 @@ module Quickdraw
 				sleep 0.2
 			end
 
-		rescue
+		rescue => e
+			puts e.message
+			puts e.backtrace
+			retry
 			puts "exiting...."
 		end
 

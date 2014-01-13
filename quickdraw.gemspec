@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
 
   spec.add_runtime_dependency "thor"
-  spec.add_runtime_dependency "listen"
+  spec.add_runtime_dependency "filewatcher"
   spec.add_runtime_dependency "celluloid"
   spec.add_runtime_dependency "httparty"
   spec.add_runtime_dependency "filepath"
