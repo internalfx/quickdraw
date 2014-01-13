@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["bryan@internalfx.com"]
   spec.description   = %q{Quickly develop Shopify themes}
   spec.summary       = %q{Allows the use of ERB templates to develop and "compile" a theme and then automatically deploy to Shopify}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/internalfx/quickdraw"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -19,11 +19,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rake", "~> 10"
 
-  spec.add_runtime_dependency "thor"
-  spec.add_runtime_dependency "filewatcher"
-  spec.add_runtime_dependency "celluloid"
-  spec.add_runtime_dependency "httparty"
-  spec.add_runtime_dependency "filepath"
+  spec.add_runtime_dependency "thor", "~> 0.18"
+  spec.add_runtime_dependency "filewatcher", "~> 0.3"
+  spec.add_runtime_dependency "celluloid", "~> 0.15"
+  spec.add_runtime_dependency "httparty", "~> 0.12"
+  spec.add_runtime_dependency "filepath", "~> 0.6"
 end
